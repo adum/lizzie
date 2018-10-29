@@ -221,6 +221,10 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
         Lizzie.config.toggleHandicapInsteadOfWinrate();
         break;
 
+      case VK_EQUALS:
+        LizzieFrame.saveProblem();
+        break;
+
       case VK_PAGE_UP:
         if (controlIsPressed(e) && e.isShiftDown()) {
           Lizzie.frame.increaseMaxAlpha(5);

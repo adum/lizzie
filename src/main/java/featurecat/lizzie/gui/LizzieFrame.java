@@ -262,6 +262,19 @@ public class LizzieFrame extends JFrame {
     }
   }
 
+  public static void saveProblem() {
+    try {
+      File dir = new File("tmp");
+      dir.mkdirs();
+      File file = File.createTempFile("prob_", ".sgf", dir);
+      System.out.println(file);
+      SGFParser.saveProblem(Lizzie.board, file.getPath());
+    } catch (IOException e) {
+      e.printStackTrace();
+      return;
+    }
+  }
+
   public static void openFile() {
     FileNameExtensionFilter filter = new FileNameExtensionFilter("*.sgf or *.gib", "SGF", "GIB");
     JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");

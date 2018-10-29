@@ -421,6 +421,89 @@ public class SGFParser {
     return builder.toString();
   }
 
+  public static void saveProblem(Board board, String filename) throws IOException {
+    try (Writer writer = new OutputStreamWriter(new FileOutputStream(filename))) {
+      saveProblemToStream(board, writer);
+    }
+  }
+
+  private static void saveProblemToStream(Board board, Writer writer) throws IOException {
+    // collect game info
+    BoardHistoryList history = board.getHistory().shallowCopy();
+    GameInfo gameInfo = history.getGameInfo();
+    String playerB = gameInfo.getPlayerBlack();
+    String playerW = gameInfo.getPlayerWhite();
+    Double komi = gameInfo.getKomi();
+    Integer handicap = gameInfo.getHandicap();
+    String date = SGF_DATE_FORMAT.format(gameInfo.getDate());
+
+    // add SGF header
+    StringBuilder builder = new StringBuilder("(;");
+    StringBuilder generalProps = new StringBuilder("");
+    if (handicap != 0) generalProps.append(String.format("HA[%s]", handicap));
+    generalProps.append(
+            String.format(
+                    "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
+                    komi, playerW, playerB, date, Lizzie.lizzieVersion));
+
+    // move to the first move
+//    history.toStart();
+
+    // Game properties
+    history.getData().addProperties(generalProps.toString());
+    builder.append(history.getData().propertiesString());
+
+    // add handicap stones to SGF
+    // Process the AW/AB stone
+    Stone[] stones = history.getStones();
+    StringBuilder abStone = new StringBuilder();
+    StringBuilder awStone = new StringBuilder();
+    for (int i = 0; i < stones.length; i++) {
+      Stone stone = stones[i];
+      if (stone.isBlack() || stone.isWhite()) {
+        // i = x * Board.BOARD_SIZE + y;
+        int corY = i % Board.boardSize;
+        int corX = (i - corY) / Board.boardSize;
+
+        char x = (char) (corX + 'a');
+        char y = (char) (corY + 'a');
+
+        if (stone.isBlack()) {
+          abStone.append(String.format("[%c%c]", x, y));
+        } else {
+          awStone.append(String.format("[%c%c]", x, y));
+        }
+      }
+    }
+    if (abStone.length() > 0) {
+      builder.append("AB").append(abStone);
+    }
+    if (awStone.length() > 0) {
+      builder.append("AW").append(awStone);
+    }
+
+    // The AW/AB Comment
+    if (history.getData().comment != null) {
+      builder.append(String.format("C[%s]", history.getData().comment));
+    }
+
+    BoardData data = history.getData();
+
+    // mark the last move
+    char x = data.lastMove == null ? 't' : (char) (data.lastMove[0] + 'a');
+    char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
+    builder.append(String.format("CR[%c%c]", x, y));
+
+    // Write variation tree
+//    builder.append(generateNode(board, history.getCurrentHistoryNode()));
+
+    // close file
+    builder.append(')');
+    writer.append(builder.toString());
+
+    System.out.println(builder.toString());
+  }
+
   public static boolean isListProperty(String key) {
     return asList(listProps).contains(key);
   }
