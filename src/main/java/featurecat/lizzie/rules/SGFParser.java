@@ -452,14 +452,10 @@ public class SGFParser {
                     "KM[%s]PW[%s]PB[%s]DT[%s]AP[Lizzie: %s]",
                     komi, playerW, playerB, date, Lizzie.lizzieVersion));
 
-    // move to the first move
-//    history.toStart();
-
     // Game properties
     history.getData().addProperties(generalProps.toString());
     builder.append(history.getData().propertiesString());
 
-    // add handicap stones to SGF
     // Process the AW/AB stone
     Stone[] stones = history.getStones();
     StringBuilder abStone = new StringBuilder();
@@ -500,10 +496,6 @@ public class SGFParser {
     char y = data.lastMove == null ? 't' : (char) (data.lastMove[1] + 'a');
     builder.append(String.format("CR[%c%c]", x, y));
 
-    // Write variation tree
-//    builder.append(generateNode(board, history.getCurrentHistoryNode()));
-    Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
-
     List<MoveData> bestMoves = Lizzie.leelaz.getBestMoves();
     if (!bestMoves.isEmpty()) {
       MoveData move = bestMoves.get(0);
@@ -518,6 +510,7 @@ public class SGFParser {
 
     // close file
     builder.append(')');
+    builder.append("\n\n");
     writer.append(builder.toString());
 
     System.out.println(builder.toString());
