@@ -4,9 +4,13 @@ import static java.util.Arrays.asList;
 
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.GameInfo;
+import featurecat.lizzie.analysis.Leelaz;
+import featurecat.lizzie.analysis.MoveData;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -496,6 +500,19 @@ public class SGFParser {
 
     // Write variation tree
 //    builder.append(generateNode(board, history.getCurrentHistoryNode()));
+    Leelaz.WinrateStats stats = Lizzie.leelaz.getWinrateStats();
+
+    List<MoveData> bestMoves = Lizzie.leelaz.getBestMoves();
+    if (!bestMoves.isEmpty()) {
+      MoveData move = bestMoves.get(0);
+      int[] coord = Board.convertNameToCoordinates(move.coordinate);// "B16"
+      x = (char) (coord[0] + 'a');
+      y = (char) (coord[1] + 'a');
+      String stone = "";
+      if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
+      else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
+      builder.append(String.format("%s[%c%c]", stone, x, y));
+    }
 
     // close file
     builder.append(')');
