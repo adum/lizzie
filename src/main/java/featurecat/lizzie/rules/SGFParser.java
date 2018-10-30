@@ -209,8 +209,10 @@ public class SGFParser {
             }
           } else if (tag.equals("PB")) {
             blackPlayer = tagContent;
+            Lizzie.board.getHistory().getGameInfo().setPlayerBlack(blackPlayer);
           } else if (tag.equals("PW")) {
             whitePlayer = tagContent;
+            Lizzie.board.getHistory().getGameInfo().setPlayerWhite(whitePlayer);
           } else if (tag.equals("KM")) {
             try {
               if (tagContent.trim().isEmpty()) {
@@ -509,9 +511,9 @@ public class SGFParser {
       x = (char) (coord[0] + 'a');
       y = (char) (coord[1] + 'a');
       String stone = "";
-      if (Stone.BLACK.equals(data.lastMoveColor)) stone = "B";
-      else if (Stone.WHITE.equals(data.lastMoveColor)) stone = "W";
-      builder.append(String.format("%s[%c%c]", stone, x, y));
+      if (Stone.WHITE.equals(data.lastMoveColor)) stone = "B";
+      else if (Stone.BLACK.equals(data.lastMoveColor)) stone = "W";
+      builder.append(String.format(";%s[%c%c]", stone, x, y));
     }
 
     // close file
